@@ -237,6 +237,10 @@ app.get('/download/:filename', (req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`Interactions server running on http://localhost:${PORT}`);
+app.listen(PORT, HOST === 'localhost' ? null : HOST, () => {
+  console.log(`${APP_NAME} server running on http://${HOST}:${PORT}`);
+  if (DEBUG_MODE) {
+    console.log(`Debug mode: enabled`);
+    console.log(`Environment: ${NODE_ENV}`);
+  }
 });

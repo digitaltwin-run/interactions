@@ -1,22 +1,54 @@
-# 🚀 Digital Twin PWA - Makefile
-# Comprehensive build and test automation
+# Digital Twin Interactions IDE - Makefile
+# Comprehensive build and service management
 
-.PHONY: help build dev test clean docker-build docker-up docker-down docker-test install lint format
+# Import environment variables from .env file if it exists
+ifneq (,$(wildcard ./.env))
+    include .env
+    export
+endif
 
-# 📋 Default target - show help
+.PHONY: help start stop restart build dev clean install lint format migrate-components
+
+# Default target - show help
 help:
-	@echo "🚀 Digital Twin PWA - Available Commands:"
+	@echo "Digital Twin Interactions IDE - Available Commands:"
 	@echo ""
-	@echo "📦 SETUP & INSTALLATION:"
-	@echo "  make install          - Install all dependencies"
+	@echo "SETUP & INSTALLATION:"
+	@echo "  make install         - Install all dependencies"
 	@echo "  make setup           - Initial project setup"
 	@echo ""
-	@echo "🔧 DEVELOPMENT:"
-	@echo "  make dev             - Start development server"
+	@echo "SERVICES:"
+	@echo "  make start           - Start Interactions IDE server (PORT=$(PORT))"
+	@echo "  make stop            - Stop running Interactions IDE server"
+	@echo "  make restart         - Restart Interactions IDE server"
+	@echo "  make dev             - Start development server with nodemon"
+	@echo ""
+	@echo "MIGRATION:"
+	@echo "  make migrate-components  - Extract and migrate component scripts from PWA"
+	@echo ""
+	@echo "UTILITIES:"
 	@echo "  make build           - Build production version"
 	@echo "  make clean           - Clean build artifacts"
 	@echo ""
-	@echo "🧪 TESTING:"
+	@echo "# Service management commands
+start:
+	@echo "Starting Digital Twin Interactions IDE server on port $(PORT)..."
+	@node server.js
+
+stop:
+	@echo "Stopping Digital Twin Interactions IDE server..."
+	-@pkill -f "node server.js" || echo "No server process found"
+
+restart: stop
+	@echo "Restarting Digital Twin Interactions IDE server..."
+	@sleep 1
+	@$(MAKE) start
+
+dev:
+	@echo "Starting development server with nodemon on port $(PORT)..."
+	@npx nodemon server.js
+
+# TESTING:"
 	@echo "  make test            - Run all tests"
 	@echo "  make test-unit       - Run unit tests"
 	@echo "  make test-integration - Run integration tests"
@@ -27,7 +59,26 @@ help:
 	@echo "  make test-watch      - Run tests in watch mode"
 	@echo "  make test-coverage   - Run tests with coverage report"
 	@echo ""
-	@echo "🐳 DOCKER:"
+
+# Component migration
+migrate-components:
+	@echo "Migrating component interaction scripts from PWA..."
+	@node scripts/migrate-components.js
+	@echo "Migration complete. Check resources/scripts/ for the migrated component scripts."
+
+install:
+	@echo "Installing dependencies..."
+	@npm install
+
+clean:
+	@echo "Cleaning build artifacts..."
+	@rm -rf dist
+
+build:
+	@echo "Building for production..."
+	@npm run build
+
+# Docker
 	@echo "  make docker-build    - Build Docker images"
 	@echo "  make docker-up       - Start Docker environment"
 	@echo "  make docker-down     - Stop Docker environment"

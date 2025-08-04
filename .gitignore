@@ -1,5 +1,10 @@
 .idea
+public/*.html
+scripts/*.js
+resources/scripts/*.js
+resources/svg/*.svg
 
+.env
 package-lock.json
 # Logs
 logs
