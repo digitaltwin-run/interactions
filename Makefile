@@ -344,9 +344,6 @@ test2:
 	@echo "🧪 Running node tests..."
 	node server-test.js
 
-stop:
-	./stop.sh
-
 # 📈 MONITORING
 monitor:
 	@echo "📈 Starting monitoring..."

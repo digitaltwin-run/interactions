@@ -12,7 +12,15 @@ Aby to bylo mozliwe, nalezy stworzyc IDE, z lewą kolumną dla dostepnych zasob�
 kazdy plik .js powinien zawierac sie w tagach script, ktory bedzie obslugiwal akcje i widoki z svg i pozwalal na modyfikowanie widoku SVG np porzez zmiane wartosci XML w metadata 
 metadata powinna byc aktualizowana w czasie rzeczywistym a wewnetrzny skrypt componentu wlaczonego w SVG bedzie obslugiwal zmiany w metadata danego componentu wbudowanego w canva svg w czasie rzeczywistym
 
-po prawej stronie IDE bedzie kolumna własciwosci z mozliwosciami do edycji SVG i SVG 
-W centrum będzie 
+po prawej stronie IDE bedzie kolumna własciwosci z mozliwosciami do edycji SVG i script po nacisniejcu w c centrum 
+po lewej są pliki dodane do IDE w celu stworzenia interaktywnego pliku html z obsluga akcji w czasie rzeczywistym
+W centrum mamy 2 taby, jeden do podgladu preview, a drugi do edycji kodu 
+ 
+Zaproponuj lepsze rozwiazanie, jesli jest mozliwe, aby mozna bylo dopasowac skrypt do jednego lub kilku elementow component znajdujacych sie na zaladowanych SVG
+podaj przykald z html zawierajacycm 2x canva svg wygenerowane wczesniej z mozliwoscia podgladu jako makiety cyfrowe sprzetu i dzialajace z API oraz pokazujace dane w SVG i 
+pozwalajace na wizualziacje pracy i sterowanie poprzez makiety SVG z dodatkowymi skryptami w kodzie html,
 
+jak mozna zwizualizowac te JS skrypty, aby można by ło je łatwo dopasować do inetarakcji i dopisać kod? 
+ale też żeby doziwerciedlały interakcje wszystkich elementow w ramach pliku html zawierajacych kilka SVG i kilka script
 
+Zaproponuj GUI dla IDE
