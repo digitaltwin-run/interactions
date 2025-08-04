@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digital Twin Interactions IDE</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <header>
+    <h1>Digital Twin Interactions IDE</h1>
+    <div class="toolbar">
+      <button id="generateBtn">Generate Interactive HTML</button>
+      <input type="text" id="projectTitle" placeholder="Project Title">
+    </div>
+  </header>
+  
+  <main>
+    <div class="left-panel">
+      <div class="resource-section">
+        <h2>SVG Resources</h2>
+        <div class="upload-container">
+          <form id="uploadSvgForm" enctype="multipart/form-data">
+            <input type="file" name="file" id="svgFileInput" accept=".svg">
+            <button type="submit">Upload SVG</button>
+          </form>
+        </div>
+        <div class="resource-list" id="svgList">
+          <% if (svgFiles && svgFiles.length > 0) { %>
+            <% svgFiles.forEach(file => { %>
+              <div class="resource-item svg-item" data-file="<%= file %>">
+                <span class="file-name"><%= file %></span>
+                <div class="resource-actions">
+                  <button class="preview-btn" data-type="svg" data-file="<%= file %>">Preview</button>
+                  <button class="add-btn" data-type="svg" data-file="<%= file %>">Add</button>
+                </div>
+              </div>
+            <% }); %>
+          <% } else { %>
+            <p class="empty-list">No SVG files uploaded</p>
+          <% } %>
+        </div>
+      </div>
+      
+      <div class="resource-section">
+        <h2>JavaScript Resources</h2>
+        <div class="upload-container">
+          <form id="uploadJsForm" enctype="multipart/form-data">
+            <input type="file" name="file" id="jsFileInput" accept=".js">
+            <button type="submit">Upload JS</button>
+          </form>
+        </div>
+        <div class="resource-list" id="jsList">
+          <% if (scriptFiles && scriptFiles.length > 0) { %>
+            <% scriptFiles.forEach(file => { %>
+              <div class="resource-item js-item" data-file="<%= file %>">
+                <span class="file-name"><%= file %></span>
+                <div class="resource-actions">
+                  <button class="preview-btn" data-type="script" data-file="<%= file %>">Preview</button>
+                  <button class="add-btn" data-type="script" data-file="<%= file %>">Add</button>
+                </div>
+              </div>
+            <% }); %>
+          <% } else { %>
+            <p class="empty-list">No JS files uploaded</p>
+          <% } %>
+        </div>
+      </div>
+    </div>
+    
+    <div class="center-panel">
+      <div class="canvas-container" id="canvasContainer">
+        <div class="empty-state">
+          <p>Add SVG files from the left panel to see them here</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="right-panel">
+      <div class="selected-resources">
+        <h3>Selected Resources</h3>
+        <div class="selected-section">
+          <h4>SVG Files</h4>
+          <ul id="selectedSvgFiles"></ul>
+        </div>
+        <div class="selected-section">
+          <h4>JS Files</h4>
+          <ul id="selectedJsFiles"></ul>
+        </div>
+      </div>
+      
+      <div class="code-preview">
+        <h3>Code Preview</h3>
+        <div class="preview-tabs">
+          <button class="tab-btn active" data-tab="svgPreview">SVG</button>
+          <button class="tab-btn" data-tab="jsPreview">JavaScript</button>
+        </div>
+        <div class="preview-content">
+          <div id="svgPreview" class="tab-content active">
+            <pre><code id="svgCode">Select an SVG file to preview its code</code></pre>
+          </div>
+          <div id="jsPreview" class="tab-content">
+            <pre><code id="jsCode">Select a JS file to preview its code</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <div id="resultModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Interactive HTML Generated</h2>
+      <p>Your interactive HTML file has been successfully generated!</p>
+      <div class="modal-actions">
+        <a href="#" id="downloadLink" class="download-btn" target="_blank">Download HTML</a>
+        <button id="previewHtmlBtn" class="preview-btn">Preview</button>
+      </div>
+    </div>
+  </div>
+  
+  <div id="previewModal" class="modal">
+    <div class="modal-content preview-modal-content">
+      <span class="close">&times;</span>
+      <h2>Resource Preview</h2>
+      <div id="previewContent"></div>
+    </div>
+  </div>
+  
+  <script src="/js/app.js"></script>
+</body>
+</html>
