@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Twin with Real API Integration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .svg-container {
+            flex: 1;
+            min-width: 400px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 15px;
+        }
+        
+        .controls {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        
+        button:hover {
+            background: #0b7dda;
+        }
+        
+        .monitor {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .data-point {
+            background: #e9e9e9;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+        
+        .status {
+            color: #fff;
+            border-radius: 4px;
+            padding: 8px 12px;
+            margin-top: 10px;
+            font-weight: bold;
+            background-color: #9E9E9E;
+        }
+        
+        .status.active {
+            background-color: #4CAF50;
+        }
+        
+        h2 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            color: #555;
+            margin-bottom: 10px;
+        }
+        
+        #connectionStatus {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #F44336;
+            margin-right: 5px;
+        }
+        
+        #connectionStatus.connected {
+            background-color: #4CAF50;
+        }
+        
+        .api-settings {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+        }
+        
+        .api-settings label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .api-settings input {
+            width: 100%;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .log-container {
+            margin-top: 15px;
+            max-height: 150px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            background-color: #f8f8f8;
+        }
+        
+        .log-entry {
+            margin: 2px 0;
+            padding: 2px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .log-entry.error {
+            color: #F44336;
+        }
+        
+        .log-entry.success {
+            color: #4CAF50;
+        }
+        
+        .log-entry.info {
+            color: #2196F3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Digital Twin with Real API Integration</h1>
+    
+    <div class="controls">
+        <h2>System Control Panel</h2>
+        <button id="connectBtn">Connect to API</button>
+        <button id="startBtn">Start System</button>
+        <button id="stopBtn">Stop System</button>
+        <button id="refreshBtn">Refresh Data</button>
+        <span id="connectionStatus"></span>
+        <span id="connectionText">Disconnected</span>
+        
+        <div class="api-settings">
+            <h3>API Settings</h3>
+            <label for="apiUrl">API Base URL:</label>
+            <input type="text" id="apiUrl" value="http://localhost:5011/api">
+            <button id="saveSettingsBtn">Save Settings</button>
+        </div>
+        
+        <div class="monitor">
+            <h3>System Data Monitor</h3>
+            <div class="data-point">Temperature: <span id="systemTemp">--°C</span></div>
+            <div class="data-point">Pressure: <span id="systemPressure">-- hPa</span></div>
+            <div class="data-point">Flow Rate: <span id="systemFlow">-- L/min</span></div>
+            <div class="data-point">Tank Level: <span id="systemLevel">--%</span></div>
+        </div>
+        
+        <div class="log-container">
+            <div id="logEntries"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- SVG Container 1: Tank -->
+        <div class="svg-container" id="tank-container">
+            <h2>Storage Tank</h2>
+            <svg id="tank-svg" width="300" height="300" viewBox="0 0 300 300">
+                <!-- Tank Metadata -->
+                <metadata>
+                    <data-temperature>25</data-temperature>
+                    <data-pressure>1013</data-pressure>
+                    <data-level>50</data-level>
+                    <data-status>standby</data-status>
+                </metadata>
+                
+                <!-- Tank Body -->
+                <rect id="tank-body" x="75" y="50" width="150" height="200" rx="10" ry="10" fill="#E0E0E0" stroke="#333" stroke-width="2" data-script="tank" data-event="click"></rect>
+                
+                <!-- Tank Liquid -->
+                <rect id="tank-level" x="75" y="150" width="150" height="100" fill="#2196F3" opacity="0.8"></rect>
+                
+                <!-- Tank Title -->
+                <text id="tank-title" x="150" y="30" text-anchor="middle" font-size="16" font-weight="bold">Storage Tank</text>
+                
+                <!-- Sensors -->
+                <circle id="sensor-top" cx="50" cy="75" r="8" fill="#FF5722" stroke="#333" data-script="sensor" data-event="click"></circle>
+                <text x="50" y="60" text-anchor="middle" font-size="10">Temp</text>
+                
+                <circle id="sensor-middle" cx="50" cy="150" r="8" fill="#4CAF50" stroke="#333" data-script="sensor" data-event="click"></circle>
+                <text x="50" y="135" text-anchor="middle" font-size="10">Pressure</text>
+                
+                <circle id="sensor-bottom" cx="50" cy="225" r="8" fill="#2196F3" stroke="#333" data-script="sensor" data-event="click"></circle>
+                <text x="50" y="210" text-anchor="middle" font-size="10">Level</text>
+                
+                <!-- Valves -->
+                <rect id="valve-input" x="115" y="10" width="20" height="20" fill="#9E9E9E" stroke="#333" rx="2" ry="2" data-script="valve" data-event="click"></rect>
+                <text x="150" y="25" font-size="10">Input Valve</text>
+                
+                <rect id="valve-output" x="115" y="270" width="20" height="20" fill="#9E9E9E" stroke="#333" rx="2" ry="2" data-script="valve" data-event="click"></rect>
+                <text x="150" y="285" font-size="10">Output Valve</text>
+            </svg>
+        </div>
+        
+        <!-- SVG Container 2: Pump -->
+        <div class="svg-container" id="pump-container">
+            <h2>Pump System</h2>
+            <svg id="pump-svg" width="300" height="300" viewBox="0 0 300 300">
+                <!-- Pump Metadata -->
+                <metadata>
+                    <data-rpm>0</data-rpm>
+                    <data-power>0</data-power>
+                    <data-status>off</data-status>
+                    <data-flow>0</data-flow>
+                </metadata>
+                
+                <!-- Pump Body -->
+                <circle id="pump-body" cx="150" cy="150" r="60" fill="#E0E0E0" stroke="#333" stroke-width="2" data-script="pump" data-event="click"></circle>
+                
+                <!-- Pump Motor -->
+                <circle id="pump-motor" cx="150" cy="150" r="30" fill="#9E9E9E" stroke="#333" stroke-width="1.5"></circle>
+                
+                <!-- Pump Blades (will rotate when active) -->
+                <g id="pump-blades">
+                    <line x1="150" y1="130" x2="150" y2="110" stroke="#333" stroke-width="4" stroke-linecap="round"></line>
+                    <line x1="150" y1="170" x2="150" y2="190" stroke="#333" stroke-width="4" stroke-linecap="round"></line>
+                    <line x1="130" y1="150" x2="110" y2="150" stroke="#333" stroke-width="4" stroke-linecap="round"></line>
+                    <line x1="170" y1="150" x2="190" y2="150" stroke="#333" stroke-width="4" stroke-linecap="round"></line>
+                </g>
+                
+                <!-- Pump Title -->
+                <text id="pump-title" x="150" y="30" text-anchor="middle" font-size="16" font-weight="bold">Pump System</text>
+                
+                <!-- Pump Status -->
+                <text id="pump-status" x="150" y="240" text-anchor="middle" font-size="14">Status: OFF</text>
+                
+                <!-- Controls -->
+                <rect id="pump-start" x="70" y="260" width="60" height="25" rx="5" ry="5" fill="#4CAF50" stroke="#333" data-script="pump" data-event="click" data-action="start"></rect>
+                <text x="100" y="277" text-anchor="middle" fill="white" font-size="12">START</text>
+                
+                <rect id="pump-stop" x="170" y="260" width="60" height="25" rx="5" ry="5" fill="#F44336" stroke="#333" data-script="pump" data-event="click" data-action="stop"></rect>
+                <text x="200" y="277" text-anchor="middle" fill="white" font-size="12">STOP</text>
+                
+                <!-- Flow Direction Indicators -->
+                <path id="flow-in" d="M50,150 L80,150 M70,140 L80,150 L70,160" stroke="#2196F3" stroke-width="2" fill="none"></path>
+                <path id="flow-out" d="M220,150 L250,150 M240,140 L250,150 L240,160" stroke="#2196F3" stroke-width="2" fill="none"></path>
+            </svg>
+        </div>
+    </div>
+
+    <script src="/resources/examples/component-library.js"></script>
+    <script>
+        /**
+         * Application Controller
+         */
+        class AppController {
+            constructor() {
+                this.systemController = null;
+                this.apiBaseUrl = document.getElementById('apiUrl').value;
+                this.connected = false;
+                
+                this.initUI();
+            }
+            
+            initUI() {
+                // Set up button handlers
+                document.getElementById('connectBtn').addEventListener('click', () => this.connectToAPI());
+                document.getElementById('startBtn').addEventListener('click', () => this.startSystem());
+                document.getElementById('stopBtn').addEventListener('click', () => this.stopSystem());
+                document.getElementById('refreshBtn').addEventListener('click', () => this.refreshData());
+                document.getElementById('saveSettingsBtn').addEventListener('click', () => this.saveSettings());
+            }
+            
+            async connectToAPI() {
+                this.log('Connecting to API...', 'info');
+                
+                try {
+                    const response = await fetch(`${this.apiBaseUrl}/data`);
+                    
+                    if (!response.ok) {
+                        throw new Error(`API error: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    this.connected = true;
+                    this.updateConnectionStatus(true);
+                    
+                    this.log('Connected to API successfully', 'success');
+                    
+                    // Initialize system controller if needed
+                    if (!this.systemController) {
+                        this.initializeSystem();
+                    }
+                    
+                    // Update with initial data
+                    this.updateSystemMonitor(data);
+                } catch (error) {
+                    this.connected = false;
+                    this.updateConnectionStatus(false);
+                    this.log(`Connection error: ${error.message}`, 'error');
+                }
+            }
+            
+            initializeSystem() {
+                // Initialize with SVG IDs
+                this.systemController = new DigitalTwinComponents.SystemController({
+                    tank: 'tank-svg',
+                    pump: 'pump-svg'
+                }, {
+                    apiBaseUrl: this.apiBaseUrl,
+                    updateInterval: 2000
+                });
+                
+                this.log('System controller initialized', 'info');
+            }
+            
+            startSystem() {
+                if (!this.connected) {
+                    this.log('Cannot start system: Not connected to API', 'error');
+                    return;
+                }
+                
+                if (!this.systemController) {
+                    this.initializeSystem();
+                }
+                
+                this.systemController.start();
+                this.log('System started', 'success');
+            }
+            
+            stopSystem() {
+                if (!this.systemController) {
+                    this.log('System not initialized', 'error');
+                    return;
+                }
+                
+                this.systemController.stop();
+                this.log('System stopped', 'info');
+            }
+            
+            async refreshData() {
+                if (!this.connected) {
+                    this.log('Cannot refresh data: Not connected to API', 'error');
+                    return;
+                }
+                
+                try {
+                    const response = await fetch(`${this.apiBaseUrl}/data`);
+                    
+                    if (!response.ok) {
+                        throw new Error(`API error: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    // Update system monitor
+                    this.updateSystemMonitor(data);
+                    
+                    // Update components if controller exists
+                    if (this.systemController) {
+                        Object.values(this.systemController.components).forEach(component => {
+                            const apiComponent = component.config.apiComponent;
+                            if (data[apiComponent]) {
+                                component.update(data[apiComponent]);
+                            }
+                        });
+                    }
+                    
+                    this.log('Data refreshed', 'info');
+                } catch (error) {
+                    this.log(`Error refreshing data: ${error.message}`, 'error');
+                }
+            }
+            
+            saveSettings() {
+                const newUrl = document.getElementById('apiUrl').value;
+                
+                if (newUrl !== this.apiBaseUrl) {
+                    this.apiBaseUrl = newUrl;
+                    this.connected = false;
+                    this.updateConnectionStatus(false);
+                    
+                    // Reset controller with new settings
+                    if (this.systemController) {
+                        this.systemController.stop();
+                        this.systemController = null;
+                    }
+                    
+                    this.log(`API URL updated to: ${this.apiBaseUrl}`, 'info');
+                }
+            }
+            
+            updateConnectionStatus(connected) {
+                const statusIndicator = document.getElementById('connectionStatus');
+                const statusText = document.getElementById('connectionText');
+                
+                if (connected) {
+                    statusIndicator.classList.add('connected');
+                    statusText.textContent = 'Connected';
+                } else {
+                    statusIndicator.classList.remove('connected');
+                    statusText.textContent = 'Disconnected';
+                }
+            }
+            
+            updateSystemMonitor(data) {
+                // Update dashboard with system data
+                if (data.tank1) {
+                    document.getElementById('systemTemp').textContent = `${data.tank1.temperature}°C`;
+                    document.getElementById('systemPressure').textContent = `${data.tank1.pressure} hPa`;
+                    document.getElementById('systemLevel').textContent = `${data.tank1.level}%`;
+                }
+                
+                if (data.pump1) {
+                    document.getElementById('systemFlow').textContent = `${data.pump1.flow} L/min`;
+                }
+            }
+            
+            log(message, type = 'info') {
+                const logContainer = document.getElementById('logEntries');
+                const logEntry = document.createElement('div');
+                logEntry.className = `log-entry ${type}`;
+                
+                const timestamp = new Date().toLocaleTimeString();
+                logEntry.textContent = `[${timestamp}] ${message}`;
+                
+                // Add to top
+                logContainer.insertBefore(logEntry, logContainer.firstChild);
+                
+                // Limit entries
+                if (logContainer.children.length > 50) {
+                    logContainer.removeChild(logContainer.lastChild);
+                }
+                
+                console.log(`[${type}] ${message}`);
+            }
+        }
+        
+        // Initialize app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            window.app = new AppController();
+        });
+    </script>
+</body>
+</html>

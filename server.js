@@ -52,10 +52,29 @@ app.get('/', (req, res) => {
   
   const scriptFiles = fs.readdirSync(path.join(__dirname, 'resources/scripts'))
     .filter(file => file.endsWith('.js'));
+    
+  // Get example files
+  const exampleSvgFiles = fs.existsSync(path.join(__dirname, 'resources/examples')) 
+    ? fs.readdirSync(path.join(__dirname, 'resources/examples'))
+      .filter(file => file.endsWith('.svg'))
+    : [];
+    
+  const exampleJsFiles = fs.existsSync(path.join(__dirname, 'resources/examples')) 
+    ? fs.readdirSync(path.join(__dirname, 'resources/examples'))
+      .filter(file => file.endsWith('.js'))
+    : [];
+    
+  const exampleHtmlFiles = fs.existsSync(path.join(__dirname, 'resources/examples')) 
+    ? fs.readdirSync(path.join(__dirname, 'resources/examples'))
+      .filter(file => file.endsWith('.html'))
+    : [];
   
   res.render('index', { 
     svgFiles,
-    scriptFiles
+    jsFiles: scriptFiles,
+    exampleSvgFiles,
+    exampleJsFiles,
+    exampleHtmlFiles
   });
 });
 
@@ -443,6 +462,17 @@ app.post('/save-resource', (req, res) => {
 // Download generated HTML file
 app.get('/download/:filename', (req, res) => {
   const filePath = path.join(__dirname, 'public', req.params.filename);
+  
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).send('File not found');
+  }
+  
+  res.download(filePath);
+});
+
+// Serve example files
+app.get('/examples/:filename', (req, res) => {
+  const filePath = path.join(__dirname, 'resources/examples', req.params.filename);
   
   if (!fs.existsSync(filePath)) {
     return res.status(404).send('File not found');
