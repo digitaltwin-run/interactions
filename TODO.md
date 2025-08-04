@@ -24,3 +24,14 @@ jak mozna zwizualizowac te JS skrypty, aby można by ło je łatwo dopasować do
 ale też żeby doziwerciedlały interakcje wszystkich elementow w ramach pliku html zawierajacych kilka SVG i kilka script
 
 Zaproponuj GUI dla IDE
+
+zmiany w menu: zamiast modal-content użyj dodatkowych buttonow w menu, aby bezposrednio zapisac lub preview plik html 
+
+
+przy generowaniu pliku html na podstawie pliku SVG i skryptu JS, pojawia sie blad w przegladarkce logs
+14:42:43.285 Initializing pump component: unnamed interactive-2025-08-04T12-42-37-793Z.html:143:11
+14:42:43.286 Uncaught TypeError: pumpElement.querySelector is not a function
+initPump file:///home/tom/Downloads/interactive-2025-08-04T12-42-37-793Z.html:146
+onSVGLoad file:///home/tom/Downloads/interactive-2025-08-04T12-42-37-793Z.html:1
+interactive-2025-08-04T12-42-37-793Z.html:146:32
+

@@ -69,38 +69,94 @@
     </div>
     
     <div class="center-panel">
-      <div class="canvas-container" id="canvasContainer">
-        <div class="empty-state">
-          <p>Add SVG files from the left panel to see them here</p>
+      <div class="center-tabs">
+        <button class="center-tab-btn active" data-tab="preview-tab">Preview</button>
+        <button class="center-tab-btn" data-tab="code-tab">Code Editor</button>
+      </div>
+      
+      <div id="preview-tab" class="center-tab-content active">
+        <div class="canvas-container" id="canvasContainer">
+          <div class="empty-state">
+            <p>Add SVG files from the left panel to see them here</p>
+          </div>
+        </div>
+      </div>
+      
+      <div id="code-tab" class="center-tab-content">
+        <div class="code-editor-container">
+          <div class="editor-toolbar">
+            <select id="editorFileSelector">
+              <option value="">Select a file to edit</option>
+            </select>
+            <button id="saveEditorChanges" disabled>Save Changes</button>
+          </div>
+          <div id="codeEditor">
+            <textarea id="codeEditorTextarea"></textarea>
+          </div>
         </div>
       </div>
     </div>
     
     <div class="right-panel">
-      <div class="selected-resources">
+      <div class="panel-section">
         <h3>Selected Resources</h3>
-        <div class="selected-section">
-          <h4>SVG Files</h4>
-          <ul id="selectedSvgFiles"></ul>
-        </div>
-        <div class="selected-section">
-          <h4>JS Files</h4>
-          <ul id="selectedJsFiles"></ul>
-        </div>
+        <div id="selectedSvg">No SVG selected</div>
+        <div id="selectedScripts">No scripts selected</div>
       </div>
       
-      <div class="code-preview">
-        <h3>Code Preview</h3>
-        <div class="preview-tabs">
-          <button class="tab-btn active" data-tab="svgPreview">SVG</button>
-          <button class="tab-btn" data-tab="jsPreview">JavaScript</button>
-        </div>
-        <div class="preview-content">
-          <div id="svgPreview" class="tab-content active">
-            <pre><code id="svgCode">Select an SVG file to preview its code</code></pre>
+      <div class="panel-section">
+        <h3>Element Properties</h3>
+        <div id="elementProperties">
+          <p>No element selected</p>
+          <div class="property-group">
+            <label>Element ID:</label>
+            <input type="text" id="elementId" disabled>
           </div>
-          <div id="jsPreview" class="tab-content">
-            <pre><code id="jsCode">Select a JS file to preview its code</code></pre>
+          <div class="property-group">
+            <label>Element Type:</label>
+            <input type="text" id="elementType" disabled>
+          </div>
+          
+          <div class="property-group">
+            <label>Metadata:</label>
+            <div class="metadata-tabs">
+              <button class="metadata-tab active" data-tab="simple">Simple</button>
+              <button class="metadata-tab" data-tab="json">JSON</button>
+            </div>
+            
+            <div id="simpleMetadataEditor" class="metadata-editor active">
+              <div id="metadataContainer">
+                <p class="no-metadata">No metadata found for this element.</p>
+              </div>
+              <button id="addMetadataBtn" class="btn-sm">Add Field</button>
+            </div>
+            
+            <div id="jsonMetadataEditor" class="metadata-editor">
+              <textarea id="jsonMetadataTextarea" rows="8" placeholder="Enter JSON metadata..."></textarea>
+              <div class="editor-controls">
+                <button id="validateJsonBtn" class="btn-sm">Validate</button>
+                <button id="applyJsonBtn" class="btn-sm">Apply</button>
+                <button id="formatJsonBtn" class="btn-sm">Format</button>
+              </div>
+              <div id="jsonError" class="error-message"></div>
+            </div>
+          </div>
+          
+          <div class="property-group">
+            <label>Script Binding:</label>
+            <div id="scriptBindingContainer">
+              <select id="scriptSelect">
+                <option value="">Select script...</option>
+              </select>
+              <select id="eventSelect">
+                <option value="click">click</option>
+                <option value="mouseenter">mouseenter</option>
+                <option value="mouseleave">mouseleave</option>
+                <option value="mousemove">mousemove</option>
+                <option value="dblclick">dblclick</option>
+              </select>
+              <button id="bindScriptBtn" class="btn-sm">Bind</button>
+            </div>
           </div>
         </div>
       </div>
@@ -124,6 +180,26 @@
       <span class="close">&times;</span>
       <h2>Resource Preview</h2>
       <div id="previewContent"></div>
+    </div>
+  </div>
+  
+  <div id="metadataModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Add Metadata Field</h2>
+      <div class="modal-form">
+        <div class="form-field">
+          <label for="metadataKey">Key:</label>
+          <input type="text" id="metadataKey" placeholder="Enter metadata key">
+        </div>
+        <div class="form-field">
+          <label for="metadataValue">Value:</label>
+          <input type="text" id="metadataValue" placeholder="Enter metadata value">
+        </div>
+        <div class="modal-actions">
+          <button id="addMetadataFieldBtn" class="add-btn">Add Field</button>
+        </div>
+      </div>
     </div>
   </div>
   

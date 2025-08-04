@@ -7,7 +7,11 @@ ifneq (,$(wildcard ./.env))
     export
 endif
 
-.PHONY: help start stop restart build dev clean install lint format migrate-components
+# Define all phony targets
+.PHONY: help start stop restart build dev clean install lint format migrate-components \
+        test test-unit test-integration test-e2e test-lighthouse test-pwa \
+        test-accessibility test-watch test-coverage docker-build docker-up \
+        docker-down docker-test docker-logs docker-clean setup monitor
 
 # Default target - show help
 help:
@@ -18,37 +22,15 @@ help:
 	@echo "  make setup           - Initial project setup"
 	@echo ""
 	@echo "SERVICES:"
-	@echo "  make start           - Start Interactions IDE server (PORT=$(PORT))"
+	@echo "  make start           - Start Interactions IDE server (PORT=$${PORT:-3000})"
 	@echo "  make stop            - Stop running Interactions IDE server"
 	@echo "  make restart         - Restart Interactions IDE server"
 	@echo "  make dev             - Start development server with nodemon"
 	@echo ""
 	@echo "MIGRATION:"
-	@echo "  make migrate-components  - Extract and migrate component scripts from PWA"
+	@echo "  make migrate-components - Extract and migrate component scripts from PWA"
 	@echo ""
-	@echo "UTILITIES:"
-	@echo "  make build           - Build production version"
-	@echo "  make clean           - Clean build artifacts"
-	@echo ""
-	@echo "# Service management commands
-start:
-	@echo "Starting Digital Twin Interactions IDE server on port $(PORT)..."
-	@node server.js
-
-stop:
-	@echo "Stopping Digital Twin Interactions IDE server..."
-	-@pkill -f "node server.js" || echo "No server process found"
-
-restart: stop
-	@echo "Restarting Digital Twin Interactions IDE server..."
-	@sleep 1
-	@$(MAKE) start
-
-dev:
-	@echo "Starting development server with nodemon on port $(PORT)..."
-	@npx nodemon server.js
-
-# TESTING:"
+	@echo "TESTING:"
 	@echo "  make test            - Run all tests"
 	@echo "  make test-unit       - Run unit tests"
 	@echo "  make test-integration - Run integration tests"
@@ -59,48 +41,53 @@ dev:
 	@echo "  make test-watch      - Run tests in watch mode"
 	@echo "  make test-coverage   - Run tests with coverage report"
 	@echo ""
-
-# Component migration
-migrate-components:
-	@echo "Migrating component interaction scripts from PWA..."
-	@node scripts/migrate-components.js
-	@echo "Migration complete. Check resources/scripts/ for the migrated component scripts."
-
-install:
-	@echo "Installing dependencies..."
-	@npm install
-
-clean:
-	@echo "Cleaning build artifacts..."
-	@rm -rf dist
-
-build:
-	@echo "Building for production..."
-	@npm run build
-
-# Docker
+	@echo "DOCKER:"
 	@echo "  make docker-build    - Build Docker images"
 	@echo "  make docker-up       - Start Docker environment"
 	@echo "  make docker-down     - Stop Docker environment"
 	@echo "  make docker-test     - Run tests in Docker"
+	@echo "  make docker-logs     - Show Docker logs"
 	@echo "  make docker-clean    - Clean Docker containers and images"
 	@echo ""
-	@echo "🎯 CODE QUALITY:"
+	@echo "CODE QUALITY:"
 	@echo "  make lint            - Run ESLint"
 	@echo "  make format          - Format code with Prettier"
 	@echo "  make validate        - Validate project structure"
 	@echo ""
-	@echo "📊 REPORTS:"
+	@echo "REPORTS:"
 	@echo "  make report          - Generate comprehensive test report"
 	@echo "  make lighthouse      - Generate Lighthouse audit"
 	@echo "  make bundle-analysis - Analyze bundle size"
 	@echo ""
-	@echo "🚀 DEPLOYMENT:"
+	@echo "DEPLOYMENT:"
 	@echo "  make deploy-staging  - Deploy to staging"
 	@echo "  make deploy-prod     - Deploy to production"
-	@echo ""
 
+# =============================================
+# 🚀 SERVICE MANAGEMENT
+# =============================================
+
+start:
+	@echo "🚀 Starting Digital Twin Interactions IDE server on port $${PORT:-3000}..."
+	node server.js
+
+stop:
+	@echo "🛑 Stopping Digital Twin Interactions IDE server..."
+	-@pkill -f "node server\.js" || echo "No server process found"
+
+restart: stop
+	@echo "🔄 Restarting Digital Twin Interactions IDE server..."
+	@sleep 1
+	@$(MAKE) start
+
+dev:
+	@echo "👩💻 Starting development server with nodemon on port $${PORT:-3000}..."
+	npx nodemon server.js
+
+# =============================================
 # 📦 INSTALLATION & SETUP
+# =============================================
+
 install:
 	@echo "📦 Installing dependencies..."
 	npm install
@@ -114,13 +101,12 @@ setup: install
 	chmod +x .git/hooks/pre-commit || echo "Git hooks chmod skipped"
 	@echo "✅ Project setup complete"
 
-# 🔧 DEVELOPMENT
-dev:
-	@echo "🚀 Starting development server..."
-	npm run dev
+# =============================================
+# 🏗️ BUILD & CLEAN
+# =============================================
 
 build:
-	@echo "🏗️ Building production version..."
+	@echo "🏗️  Building production version..."
 	npm run build
 	@echo "✅ Build complete"
 
@@ -130,7 +116,10 @@ clean:
 	rm -f *.log
 	@echo "✅ Clean complete"
 
+# =============================================
 # 🧪 TESTING
+# =============================================
+
 test:
 	@echo "🧪 Running all tests..."
 	npm test
@@ -169,7 +158,10 @@ test-coverage:
 	npm run test:coverage
 	@echo "📄 Coverage report available at: test-results/coverage/index.html"
 
+# =============================================
 # 🐳 DOCKER OPERATIONS
+# =============================================
+
 docker-build:
 	@echo "🐳 Building Docker images..."
 	docker-compose build
@@ -182,7 +174,7 @@ docker-up:
 	@echo "📊 Selenium Grid at: http://localhost:4444"
 
 docker-down:
-	@echo "⏹️ Stopping Docker environment..."
+	@echo "⏹️  Stopping Docker environment..."
 	docker-compose down
 
 docker-test:
@@ -200,7 +192,19 @@ docker-clean:
 	docker system prune -f
 	@echo "✅ Docker cleanup complete"
 
+# =============================================
+# 🛠️  COMPONENT MIGRATION
+# =============================================
+
+migrate-components:
+	@echo "🔄 Migrating component interaction scripts from PWA..."
+	node scripts/migrate-components.js
+	@echo "✅ Migration complete. Check resources/scripts/ for the migrated component scripts."
+
+# =============================================
 # 🎯 CODE QUALITY
+# =============================================
+
 lint:
 	@echo "🔍 Running ESLint..."
 	npm run lint

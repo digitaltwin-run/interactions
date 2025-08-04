@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="250" height="300" viewBox="0 0 250 300" xmlns="http://www.w3.org/2000/svg">
+  <metadata>
+    <data-temperature>25.5</data-temperature>
+    <data-pressure>1013</data-pressure>
+    <data-level>75</data-level>
+    <data-status>normal</data-status>
+    <data-lastUpdated>2025-08-04 14:54:47</data-lastUpdated>
+  </metadata>
+  
+  <!-- Tank container -->
+  <rect id="tank-body" x="50" y="50" width="150" height="200" rx="10" ry="10" fill="#f0f0f0" stroke="#333" stroke-width="2" data-script="tank.js" data-event="click"/>
+  
+  <!-- Tank liquid level -->
+  <rect id="tank-level" x="50" y="125" width="150" height="125" rx="0" ry="0" fill="#2196F3" opacity="0.7" data-script="tank.js" data-event="mouseenter"/>
+  
+  <!-- Tank measurement markers -->
+  <line x1="40" y1="50" x2="35" y2="50" stroke="#333" stroke-width="1"/>
+  <text x="25" y="55" font-size="10">100%</text>
+  <line x1="40" y1="100" x2="35" y2="100" stroke="#333" stroke-width="1"/>
+  <text x="25" y="105" font-size="10">75%</text>
+  <line x1="40" y1="150" x2="35" y2="150" stroke="#333" stroke-width="1"/>
+  <text x="25" y="155" font-size="10">50%</text>
+  <line x1="40" y1="200" x2="35" y2="200" stroke="#333" stroke-width="1"/>
+  <text x="25" y="205" font-size="10">25%</text>
+  <line x1="40" y1="250" x2="35" y2="250" stroke="#333" stroke-width="1"/>
+  <text x="25" y="255" font-size="10">0%</text>
+  
+  <!-- Tank labels -->
+  <text id="tank-title" x="125" y="30" text-anchor="middle" font-size="16" font-weight="bold">Storage Tank</text>
+  <text id="tank-temp" x="125" y="270" text-anchor="middle" font-size="12">Temperature: 25.5°C</text>
+  <text id="tank-press" x="125" y="290" text-anchor="middle" font-size="12">Pressure: 1013 hPa</text>
+  
+  <!-- Tank sensor points -->
+  <circle id="sensor-top" cx="210" cy="70" r="8" fill="#FF5722" stroke="#333" data-script="sensor.js" data-event="click"/>
+  <circle id="sensor-middle" cx="210" cy="150" r="8" fill="#4CAF50" stroke="#333" data-script="sensor.js" data-event="click"/>
+  <circle id="sensor-bottom" cx="210" cy="230" r="8" fill="#2196F3" stroke="#333" data-script="sensor.js" data-event="click"/>
+  
+  <!-- Tank valves -->
+  <rect id="valve-input" x="100" y="10" width="50" height="20" rx="5" ry="5" fill="#9E9E9E" stroke="#333" data-script="valve.js" data-event="click"/>
+  <text x="125" y="24" text-anchor="middle" font-size="10" fill="white">INLET</text>
+  
+  <rect id="valve-output" x="100" y="270" width="50" height="20" rx="5" ry="5" fill="#9E9E9E" stroke="#333" data-script="valve.js" data-event="click"/>
+  <text x="125" y="284" text-anchor="middle" font-size="10" fill="white">OUTLET</text>
+</svg>

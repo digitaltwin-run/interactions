@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiple SVG Interaction Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .svg-container {
+            flex: 1;
+            min-width: 400px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 15px;
+        }
+        
+        .controls {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        
+        button:hover {
+            background: #0b7dda;
+        }
+        
+        .monitor {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .data-point {
+            background: #e9e9e9;
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+        
+        .status {
+            color: #fff;
+            border-radius: 4px;
+            padding: 8px 12px;
+            margin-top: 10px;
+            font-weight: bold;
+            background-color: #9E9E9E;
+        }
+        
+        .status.active {
+            background-color: #4CAF50;
+        }
+        
+        h2 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            color: #555;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Multiple SVG Interaction Test</h1>
+    
+    <div class="controls">
+        <h2>Simulation Control</h2>
+        <button id="startSimulation">Start Simulation</button>
+        <button id="stopSimulation">Stop Simulation</button>
+        <button id="refreshData">Refresh Data</button>
+        <div class="status" id="simulationStatus">Status: Stopped</div>
+        
+        <div class="monitor">
+            <h3>System Data Monitor</h3>
+            <div class="data-point">Temperature: <span id="systemTemp">25°C</span></div>
+            <div class="data-point">Pressure: <span id="systemPressure">1013 hPa</span></div>
+            <div class="data-point">Flow Rate: <span id="systemFlow">0 L/min</span></div>
+            <div class="data-point">Tank Level: <span id="systemLevel">50%</span></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- SVG Container 1: Tank -->
+        <div class="svg-container" id="tank-container">
+            <h2>Storage Tank</h2>
+            <svg id="tank-svg" width="300" height="300" viewBox="0 0 300 300">
+                <!-- Tank Metadata -->
+                <metadata>
+                    <data-temperature>25</data-temperature>
+                    <data-pressure>1013</data-pressure>
+                    <data-level>50</data-level>
+                    <data-status>standby</data-status>
+                </metadata>
+                
+                <!-- Tank Body -->
+                <rect id="tank-body" x="75" y="50" width="150" height="200" rx="10" ry="10" fill="#E0E0E0" stroke="#333" stroke-width="2" data-script="tank" data-event="click"></rect>
+                
+                <!-- Tank Liquid -->
+                <rect id="tank-level" x="75" y="150" width="150" height="100" fill="#2196F3" opacity="0.8"></rect>
+                
+                <!-- Tank Title -->
+                <text id="tank-title" x="150" y="30" text-anchor="middle" font-size="16" font-weight="bold">Storage Tank</text>
+                
+                <!-- Sensors -->
+                <circle id="sensor-top" cx="50" cy="75" r="8" fill="#FF5722" stroke="#333" data-script="sensor" data-event="click"></circle>
+                <text x="50" y="60" text-anchor="middle" font-size="10">Temp</text>
+                
+                <circle id="sensor-middle" cx="50" cy="150" r="8" fill="#4CAF50" stroke="#333" data-script="sensor" data-event="click"></circle>
+                <text x="50" y="135" text-anchor="middle" font-size="10">Pressure</text>
+                
+                <circle id="sensor-bottom" cx="50" cy="225" r="8" fill="#2196F3" stroke="#333" data-script="sensor" data-event="click"></circle>
+                <text x="50" y="210" text-anchor="middle" font-size="10">Level</text>
+                
+                <!-- Valves -->
+                <rect id="valve-input" x="115" y="10" width="20" height="20" fill="#9E9E9E" stroke="#333" rx="2" ry="2" data-script="valve" data-event="click"></rect>
+                <text x="150" y="25" font-size="10">Input Valve</text>
+                
+                <rect id="valve-output" x="115" y="270" width="20" height="20" fill="#9E9E9E" stroke="#333" rx="2" ry="2" data-script="valve" data-event="click"></rect>
+                <text x="150" y="285" font-size="10">Output Valve</text>
+            </svg>
+        </div>
+        
+        <!-- SVG Container 2: Pump -->
+        <div class="svg-container" id="pump-container">
+            <h2>Pump System</h2>
+            <svg id="pump-svg" width="300" height="300" viewBox="0 0 300 300">
+                <!-- Pump Metadata -->
+                <metadata>
+                    <data-rpm>0</data-rpm>
+                    <data-power>0</data-power>
+                    <data-status>off</data-status>
+                    <data-flow>0</data-flow>
+                </metadata>
+                
+                <!-- Pump Body -->
+                <circle id="pump-body" cx="150" cy="150" r="60" fill="#E0E0E0" stroke="#333" stroke-width="2" data-script="pump" data-event="click"></circle>
+                
+                <!-- Pump Motor -->
+                <circle id="pump-motor" cx="150" cy="150" r="30" fill="#9E9E9E" stroke="#333" stroke-width="1.5"></circle>
+                
+                <!-- Pump Blades (will rotate when active) -->
+                <g id="pump-blades">
+                    <line x1="150" y1="130" x2="150" y2="110" stroke="#333" stroke-width="4" stroke-linecap="round"></line>
+                    <line x1="150" y1="170" x2="150" y2="190" stroke="#333" stroke-width="4" stroke-linecap="round"></line>
+                    <line x1="130" y1="150" x2="110" y2="150" stroke="#333" stroke-width="4" stroke-linecap="round"></line>
+                    <line x1="170" y1="150" x2="190" y2="150" stroke="#333" stroke-width="4" stroke-linecap="round"></line>
+                </g>
+                
+                <!-- Pump Title -->
+                <text id="pump-title" x="150" y="30" text-anchor="middle" font-size="16" font-weight="bold">Pump System</text>
+                
+                <!-- Pump Status -->
+                <text id="pump-status" x="150" y="240" text-anchor="middle" font-size="14">Status: OFF</text>
+                
+                <!-- Controls -->
+                <rect id="pump-start" x="70" y="260" width="60" height="25" rx="5" ry="5" fill="#4CAF50" stroke="#333" data-script="pump" data-event="click" data-action="start"></rect>
+                <text x="100" y="277" text-anchor="middle" fill="white" font-size="12">START</text>
+                
+                <rect id="pump-stop" x="170" y="260" width="60" height="25" rx="5" ry="5" fill="#F44336" stroke="#333" data-script="pump" data-event="click" data-action="stop"></rect>
+                <text x="200" y="277" text-anchor="middle" fill="white" font-size="12">STOP</text>
+                
+                <!-- Flow Direction Indicators -->
+                <path id="flow-in" d="M50,150 L80,150 M70,140 L80,150 L70,160" stroke="#2196F3" stroke-width="2" fill="none"></path>
+                <path id="flow-out" d="M220,150 L250,150 M240,140 L250,150 L240,160" stroke="#2196F3" stroke-width="2" fill="none"></path>
+            </svg>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * Shared state for component interaction
+         */
+        const systemState = {
+            running: false,
+            temperature: 25,
+            pressure: 1013,
+            flowRate: 0,
+            tankLevel: 50,
+            tankInputOpen: false,
+            tankOutputOpen: false,
+            pumpStatus: 'off',
+            pumpPower: 0,
+            simulationInterval: null,
+        };
+
+        /**
+         * Tank component handlers
+         */
+        function initTank(svg, data) {
+            console.log('Initializing tank component');
+            
+            // Set initial level based on metadata
+            const metadata = svg.querySelector('metadata');
+            if (metadata) {
+                const levelData = metadata.querySelector('data-level');
+                if (levelData) {
+                    const level = parseFloat(levelData.textContent);
+                    const tankLevel = svg.querySelector('#tank-level');
+                    
+                    if (tankLevel) {
+                        const maxHeight = 200; // Height of tank
+                        const newHeight = (level / 100) * maxHeight;
+                        const newY = 50 + maxHeight - newHeight; // 50 is the tank's y position
+                        
+                        tankLevel.setAttribute('height', newHeight);
+                        tankLevel.setAttribute('y', newY);
+                    }
+                }
+            }
+        }
+        
+        function updateTank(svg, data) {
+            console.log('Updating tank with new data');
+            
+            // Update tank visualization based on data
+            const metadata = svg.querySelector('metadata');
+            if (!metadata) return;
+            
+            // Get tank elements
+            const tankBody = svg.querySelector('#tank-body');
+            const tankLevel = svg.querySelector('#tank-level');
+            const tankTitle = svg.querySelector('#tank-title');
+            
+            // Update tank level
+            const levelData = metadata.querySelector('data-level');
+            if (levelData && tankLevel) {
+                const level = parseFloat(levelData.textContent);
+                systemState.tankLevel = level; // Update system state
+                
+                // Update level visualization
+                const maxHeight = 200; // Height of tank
+                const newHeight = (level / 100) * maxHeight;
+                const newY = 50 + maxHeight - newHeight; // 50 is the tank's y position
+                
+                tankLevel.setAttribute('height', newHeight);
+                tankLevel.setAttribute('y', newY);
+                
+                // Update color based on level
+                if (level < 20) {
+                    tankLevel.setAttribute('fill', '#F44336'); // Red for low level
+                } else if (level > 80) {
+                    tankLevel.setAttribute('fill', '#2196F3'); // Blue for high level
+                } else {
+                    tankLevel.setAttribute('fill', '#2196F3'); // Normal blue
+                }
+                
+                // Update system monitor
+                document.getElementById('systemLevel').textContent = level + '%';
+            }
+            
+            // Update tank temperature
+            const tempData = metadata.querySelector('data-temperature');
+            if (tempData) {
+                const temp = parseFloat(tempData.textContent);
+                systemState.temperature = temp; // Update system state
+                document.getElementById('systemTemp').textContent = temp + '°C';
+            }
+            
+            // Update tank pressure
+            const pressureData = metadata.querySelector('data-pressure');
+            if (pressureData) {
+                const pressure = parseFloat(pressureData.textContent);
+                systemState.pressure = pressure; // Update system state
+                document.getElementById('systemPressure').textContent = pressure + ' hPa';
+            }
+        }
+        
+        function tank(element, event) {
+            console.log('Tank clicked', element.id);
+            
+            // Toggle tank status
+            const svg = element.closest('svg');
+            const metadata = svg.querySelector('metadata');
+            
+            if (metadata) {
+                const statusData = metadata.querySelector('data-status');
+                if (statusData) {
+                    const currentStatus = statusData.textContent;
+                    const newStatus = currentStatus === 'active' ? 'standby' : 'active';
+                    
+                    // Update metadata
+                    statusData.textContent = newStatus;
+                    
+                    // Visual feedback
+                    element.setAttribute('fill', newStatus === 'active' ? '#B0BEC5' : '#E0E0E0');
+                    
+                    // Update title
+                    const tankTitle = svg.querySelector('#tank-title');
+                    if (tankTitle) {
+                        tankTitle.textContent = `Storage Tank (${newStatus.toUpperCase()})`;
+                    }
+                }
+            }
+        }
+
+        /**
+         * Valve component handlers
+         */
+        function initValve(svg, data) {
+            console.log('Initializing valve components');
+            
+            // Find all valve elements
+            const valves = svg.querySelectorAll('[id^="valve-"]');
+            
+            // Initialize each valve
+            valves.forEach(valve => {
+                // Set initial state if not already set
+                if (!valve.hasAttribute('data-state')) {
+                    valve.setAttribute('data-state', 'closed');
+                }
+            });
+        }
+        
+        function updateValve(svg, data) {
+            // Update valve states based on data
+        }
+        
+        function valve(element, event) {
+            console.log('Valve clicked', element.id);
+            
+            // Toggle valve state
+            const currentState = element.getAttribute('data-state') || 'closed';
+            const newState = currentState === 'closed' ? 'open' : 'closed';
+            
+            // Update valve state
+            element.setAttribute('data-state', newState);
+            
+            // Update appearance
+            if (newState === 'open') {
+                element.setAttribute('fill', '#4CAF50'); // Green for open
+            } else {
+                element.setAttribute('fill', '#9E9E9E'); // Gray for closed
+            }
+            
+            // Update system state based on valve
+            if (element.id === 'valve-input') {
+                systemState.tankInputOpen = (newState === 'open');
+            } else if (element.id === 'valve-output') {
+                systemState.tankOutputOpen = (newState === 'open');
+            }
+            
+            // Update text label
+            const valveId = element.id.split('-')[1];
+            const nextSibling = element.nextElementSibling;
+            if (nextSibling && nextSibling.tagName === 'text') {
+                nextSibling.textContent = `${valveId.charAt(0).toUpperCase() + valveId.slice(1)} Valve: ${newState.toUpperCase()}`;
+            }
+        }
+
+        /**
+         * Pump component handlers
+         */
+        function initPump(svg) {
+            console.log('Initializing pump component');
+        }
+        
+        function updatePump(svg, data) {
+            const metadata = svg.querySelector('metadata');
+            if (!metadata) return;
+            
+            // Update RPM
+            if (systemState.pumpStatus === 'on') {
+                const rpmData = metadata.querySelector('data-rpm');
+                if (rpmData) {
+                    // Generate RPM based on system state
+                    const rpm = systemState.pumpPower * 100; // 0-100 scale
+                    rpmData.textContent = rpm;
+                    
+                    // Update flow rate based on pump speed and valve states
+                    const flowRate = calculateFlowRate();
+                    
+                    // Update metadata
+                    const flowData = metadata.querySelector('data-flow');
+                    if (flowData) {
+                        flowData.textContent = flowRate;
+                    }
+                    
+                    // Update system state
+                    systemState.flowRate = flowRate;
+                    
+                    // Update UI
+                    document.getElementById('systemFlow').textContent = flowRate + ' L/min';
+                    
+                    // Rotate pump blades based on RPM
+                    rotatePumpBlades(svg, rpm);
+                }
+            } else {
+                // Stop rotation
+                const blades = svg.querySelector('#pump-blades');
+                if (blades) {
+                    blades.removeAttribute('transform');
+                }
+            }
+        }
+        
+        function pump(element, event) {
+            console.log('Pump element clicked', element.id);
+            
+            // Handle different pump controls
+            if (element.id === 'pump-start') {
+                startPump(element);
+            } else if (element.id === 'pump-stop') {
+                stopPump(element);
+            } else if (element.id === 'pump-body' || element.id === 'pump-motor') {
+                // Toggle pump power level
+                cyclePumpPower(element);
+            }
+        }
+        
+        function startPump(element) {
+            const svg = element.closest('svg');
+            const metadata = svg.querySelector('metadata');
+            
+            if (metadata) {
+                // Set pump to running
+                const statusData = metadata.querySelector('data-status');
+                if (statusData) {
+                    statusData.textContent = 'on';
+                    systemState.pumpStatus = 'on';
+                }
+                
+                // Set initial power
+                const powerData = metadata.querySelector('data-power');
+                if (powerData) {
+                    powerData.textContent = '50';
+                    systemState.pumpPower = 0.5; // 50%
+                }
+                
+                // Update visual indicators
+                const pumpMotor = svg.querySelector('#pump-motor');
+                if (pumpMotor) {
+                    pumpMotor.setAttribute('fill', '#4CAF50');
+                }
+                
+                // Update status text
+                const statusText = svg.querySelector('#pump-status');
+                if (statusText) {
+                    statusText.textContent = 'Status: ON (50%)';
+                }
+                
+                // Update pump appearance
+                svg.querySelector('#pump-body').setAttribute('stroke', '#2E7D32');
+            }
+        }
+        
+        function stopPump(element) {
+            const svg = element.closest('svg');
+            const metadata = svg.querySelector('metadata');
+            
+            if (metadata) {
+                // Set pump to stopped
+                const statusData = metadata.querySelector('data-status');
+                if (statusData) {
+                    statusData.textContent = 'off';
+                    systemState.pumpStatus = 'off';
+                }
+                
+                // Reset power
+                const powerData = metadata.querySelector('data-power');
+                if (powerData) {
+                    powerData.textContent = '0';
+                    systemState.pumpPower = 0;
+                }
+                
+                // Update visual indicators
+                const pumpMotor = svg.querySelector('#pump-motor');
+                if (pumpMotor) {
+                    pumpMotor.setAttribute('fill', '#9E9E9E');
+                }
+                
+                // Update status text
+                const statusText = svg.querySelector('#pump-status');
+                if (statusText) {
+                    statusText.textContent = 'Status: OFF';
+                }
+                
+                // Update pump appearance
+                svg.querySelector('#pump-body').setAttribute('stroke', '#333');
+                
+                // Reset flow rate
+                systemState.flowRate = 0;
+                document.getElementById('systemFlow').textContent = '0 L/min';
+            }
+        }
+        
+        function cyclePumpPower(element) {
+            if (systemState.pumpStatus !== 'on') return;
+            
+            const svg = element.closest('svg');
+            const metadata = svg.querySelector('metadata');
+            
+            if (metadata) {
+                // Cycle through power levels: 25% -> 50% -> 75% -> 100% -> 25%
+                const powerLevels = [0.25, 0.5, 0.75, 1.0];
+                const currentIndex = powerLevels.findIndex(p => Math.abs(p - systemState.pumpPower) < 0.01);
+                const nextIndex = (currentIndex + 1) % powerLevels.length;
+                const newPower = powerLevels[nextIndex];
+                
+                // Update state
+                systemState.pumpPower = newPower;
+                
+                // Update metadata
+                const powerData = metadata.querySelector('data-power');
+                if (powerData) {
+                    powerData.textContent = String(newPower * 100);
+                }
+                
+                // Update status text
+                const statusText = svg.querySelector('#pump-status');
+                if (statusText) {
+                    statusText.textContent = `Status: ON (${newPower * 100}%)`;
+                }
+                
+                // Visual feedback
+                const pumpBody = svg.querySelector('#pump-body');
+                if (pumpBody) {
+                    const strokeWidth = 1 + newPower * 2;
+                    pumpBody.setAttribute('stroke-width', strokeWidth);
+                }
+            }
+        }
+        
+        function rotatePumpBlades(svg, rpm) {
+            const blades = svg.querySelector('#pump-blades');
+            if (!blades) return;
+            
+            // Calculate rotation speed based on RPM
+            const rotationSpeed = rpm / 20; // Adjust divisor to control animation speed
+            
+            // Update rotation animation
+            const currentAngle = parseInt(blades.getAttribute('data-angle') || 0);
+            const newAngle = (currentAngle + rotationSpeed) % 360;
+            
+            // Apply rotation transform
+            blades.setAttribute('transform', `rotate(${newAngle} 150 150)`);
+            blades.setAttribute('data-angle', newAngle);
+        }
+        
+        /**
+         * System simulation functions
+         */
+        function calculateFlowRate() {
+            // Calculate flow based on pump power and valve states
+            if (systemState.pumpStatus !== 'on') return 0;
+            
+            let baseFlow = systemState.pumpPower * 100; // 0-100 scale
+            
+            // Reduce flow if valves are closed
+            if (!systemState.tankInputOpen && !systemState.tankOutputOpen) {
+                return 0; // No flow if both valves closed
+            } else if (!systemState.tankInputOpen || !systemState.tankOutputOpen) {
+                baseFlow *= 0.5; // Reduce flow if only one valve is open
+            }
+            
+            return Math.round(baseFlow);
+        }
+        
+        function updateTankLevel() {
+            // Only change level if simulation is running
+            if (!systemState.running) return;
+            
+            const tankSvg = document.getElementById('tank-svg');
+            if (!tankSvg) return;
+            
+            const metadata = tankSvg.querySelector('metadata');
+            if (!metadata) return;
+            
+            const levelData = metadata.querySelector('data-level');
+            if (!levelData) return;
+            
+            let currentLevel = parseFloat(levelData.textContent);
+            
+            // Calculate level change based on valves and pump
+            if (systemState.pumpStatus === 'on') {
+                // If pump is running
+                if (systemState.tankInputOpen && !systemState.tankOutputOpen) {
+                    // Input open, output closed = tank filling
+                    currentLevel += systemState.pumpPower * 2;
+                } else if (!systemState.tankInputOpen && systemState.tankOutputOpen) {
+                    // Input closed, output open = tank emptying
+                    currentLevel -= systemState.pumpPower * 2;
+                } else if (systemState.tankInputOpen && systemState.tankOutputOpen) {
+                    // Both open = slight change based on valve positions
+                    // In a real system, this would depend on pipe dimensions, pressure, etc.
+                    currentLevel -= systemState.pumpPower * 0.2;
+                }
+            }
+            
+            // Ensure level stays within bounds
+            currentLevel = Math.max(0, Math.min(100, currentLevel));
+            
+            // Update metadata
+            levelData.textContent = currentLevel.toFixed(1);
+            
+            // Trigger tank update
+            updateTank(tankSvg);
+        }
+        
+        function startSimulation() {
+            systemState.running = true;
+            document.getElementById('simulationStatus').textContent = 'Status: Running';
+            document.getElementById('simulationStatus').classList.add('active');
+            
+            // Clear any existing interval
+            if (systemState.simulationInterval) {
+                clearInterval(systemState.simulationInterval);
+            }
+            
+            // Set up simulation interval
+            systemState.simulationInterval = setInterval(() => {
+                // Update tank level based on pump and valves
+                updateTankLevel();
+                
+                // Update pump based on current state
+                const pumpSvg = document.getElementById('pump-svg');
+                if (pumpSvg) updatePump(pumpSvg);
+                
+                // Randomize a bit to simulate real-world variations
+                if (Math.random() > 0.8) {
+                    const tankSvg = document.getElementById('tank-svg');
+                    if (tankSvg) {
+                        const metadata = tankSvg.querySelector('metadata');
+                        if (metadata) {
+                            // Small random changes to temperature
+                            const tempData = metadata.querySelector('data-temperature');
+                            if (tempData) {
+                                let temp = parseFloat(tempData.textContent);
+                                temp += (Math.random() - 0.5) * 0.2;
+                                tempData.textContent = temp.toFixed(1);
+                            }
+                            
+                            // Small random changes to pressure
+                            const pressureData = metadata.querySelector('data-pressure');
+                            if (pressureData) {
+                                let pressure = parseFloat(pressureData.textContent);
+                                pressure += (Math.random() - 0.5) * 2;
+                                pressureData.textContent = pressure.toFixed(0);
+                            }
+                        }
+                    }
+                }
+            }, 500); // Update every 500ms
+        }
+        
+        function stopSimulation() {
+            systemState.running = false;
+            document.getElementById('simulationStatus').textContent = 'Status: Stopped';
+            document.getElementById('simulationStatus').classList.remove('active');
+            
+            if (systemState.simulationInterval) {
+                clearInterval(systemState.simulationInterval);
+                systemState.simulationInterval = null;
+            }
+        }
+        
+        function refreshData() {
+            // Update all components with current state
+            const tankSvg = document.getElementById('tank-svg');
+            const pumpSvg = document.getElementById('pump-svg');
+            
+            if (tankSvg) updateTank(tankSvg);
+            if (pumpSvg) updatePump(pumpSvg);
+        }
+        
+        /**
+         * Initialize the system
+         */
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize SVG components
+            const tankSvg = document.getElementById('tank-svg');
+            const pumpSvg = document.getElementById('pump-svg');
+            
+            if (tankSvg) {
+                initTank(tankSvg);
+                initValve(tankSvg);
+                
+                // Add event listeners for interactive elements
+                tankSvg.querySelectorAll('[data-script]').forEach(element => {
+                    const scriptName = element.getAttribute('data-script');
+                    const eventType = element.getAttribute('data-event') || 'click';
+                    
+                    element.addEventListener(eventType, function(e) {
+                        // Call appropriate handler based on script name
+                        if (scriptName === 'tank') tank(element, e);
+                        else if (scriptName === 'valve') valve(element, e);
+                        else if (scriptName === 'sensor') console.log('Sensor clicked, handler not implemented');
+                    });
+                });
+            }
+            
+            if (pumpSvg) {
+                initPump(pumpSvg);
+                
+                // Add event listeners
+                pumpSvg.querySelectorAll('[data-script]').forEach(element => {
+                    const scriptName = element.getAttribute('data-script');
+                    const eventType = element.getAttribute('data-event') || 'click';
+                    
+                    element.addEventListener(eventType, function(e) {
+                        if (scriptName === 'pump') pump(element, e);
+                    });
+                });
+            }
+            
+            // Set up simulation controls
+            document.getElementById('startSimulation').addEventListener('click', startSimulation);
+            document.getElementById('stopSimulation').addEventListener('click', stopSimulation);
+            document.getElementById('refreshData').addEventListener('click', refreshData);
+            
+            // Initial update
+            refreshData();
+        });
+    </script>
+</body>
+</html>
